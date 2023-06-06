@@ -1,0 +1,177 @@
+-- Query 1 : Name of Hurricane along with year
+SELECT tc_name, tc_year
+FROM Tropical_Cyclones
+ORDER BY tc_year DESC;
+
+-- Query 2: Name of Hurricane with a specific year
+SELECT tc_name
+FROM Tropical_Cyclones
+WHERE tc_year = 2018;
+
+-- Query 3: Check what basin the cylcone is located in
+SELECT tc_name, b_name 
+FROM Tropical_Cyclones, Basin
+WHERE tc_basinID = b_basinID;
+
+ --Query 4: Hurrican with deaths displayed
+SELECT tc_name,d_death
+FROM Tropical_Cyclones, Damage
+WHERE tc_cycID = d_cycID
+ORDER BY d_death DESC;
+
+-- Query 5: Hurricane at a specific year with more than 5 deaths
+SELECT tc_name,d_death
+FROM Tropical_Cyclones, Damage
+WHERE tc_cycID = d_cycID
+AND tc_year = 2018
+AND d_death > 5;
+
+--Query 6: Deaths per year
+SELECT tc_year, SUM(d_death)
+FROM Tropical_Cyclones, Damage
+WHERE tc_cycID = d_cycID
+GROUP BY tc_year;
+
+-- Query 7: Damage in Billions for each hurricane
+SELECT tc_name, d_costbn
+FROM Tropical_Cyclones, Damage
+WHERE tc_cycID = d_cycID
+ORDER BY d_costbn DESC;
+
+-- Query 8: Display Hurricane, Classification and date of Classification
+SELECT tc_name, cl_name, m_date
+FROM Tropical_Cyclones,Type, Classification, Metrics
+WHERE tc_cycID = type_cycID
+AND type_classID = cl_classID
+AND cl_classID = m_classID
+AND m_cycID = tc_cycID
+ORDER BY m_date,tc_name;
+
+--Query 9: List all States
+SELECT st_name 
+FROM States
+ORDER BY st_stateID;
+
+--Query 10: Display all information regarding affected states for each hurricane
+SELECT *
+FROM Tropical_Cyclones, Affected_Areas, States
+WHERE tc_cycID = A_cycID
+AND A_stateID = st_stateID;
+
+
+-- Query 11: List all Classifications
+SELECT cl_name
+FROM Classification
+ORDER BY cl_name;
+
+-- Query 12: List all basins
+SELECT *
+FROM Basin;
+-- Complex SQL Statements
+-- Query 12: Select cyclones with Tropical in category name
+SELECT tc_name, cl_name, m_date
+FROM Tropical_Cyclones,Type, Classification, Metrics
+WHERE tc_cycID = type_cycID
+AND type_classID = cl_classID
+AND cl_classID = m_classID
+AND m_cycID = tc_cycID
+AND cl_name LIKE 'Tropical%'
+ORDER BY m_date,tc_name;
+
+--Query 13: Select cyclones that affected Arizona
+SELECT tc_name
+FROM Tropical_Cyclones, Affected_Areas, States
+WHERE tc_cycID = A_cycID
+AND A_stateID = st_stateID
+AND st_name = 'Arizona';
+
+--Query 14: Count how many states each cyclone has affected
+SELECT tc_name, COUNT(*)
+FROM Tropical_Cyclones, Affected_Areas, States
+WHERE tc_cycID = A_cycID
+AND A_stateID = st_stateID
+AND (A_stateID != 0)
+GROUP BY tc_name;
+
+-- Query 15: List cyclones with their categories
+SELECT DISTINCT tc_name, cl_name 
+FROM Tropical_Cyclones,Type, Classification
+WHERE tc_cycID = type_cycID
+AND type_classID = cl_classID
+ORDER BY tc_cycID;
+
+-- Query 15.2:
+SELECT tc_name, cl_name 
+FROM Tropical_Cyclones,Type, Classification
+WHERE tc_cycID = type_cycID
+AND type_classID = cl_classID
+AND cl_name LIKE 'Category%'
+ORDER BY tc_cycID;
+
+-- Query 16: List categories with more than two cyclones
+SELECT cl_name, COUNT(*) as cnt
+FROM Tropical_Cyclones,Type, Classification
+WHERE tc_cycID = type_cycID
+AND type_classID = cl_classID
+GROUP BY cl_name
+HAVING cnt > 2;
+
+---------------------------------------------------------------
+--INSERT,UPDATE and DELETE 
+--Query: 17
+INSERT INTO Tropical_Cyclones 
+VALUES(8,'Coke', 2, 2022);
+--Query: 18
+INSERT INTO Affected_Areas
+VALUES (8,6),
+(8,9);
+
+--Query 19: Only one tuple per cycID
+INSERT INTO Damage
+VALUES(8,0.2,8);
+
+--Query 20:
+INSERT INTO Metrics
+VALUES(8,1,'8/27/2022',45, 11.2, 12.7),
+(8,2,'8/29/2022', 50, 12, 14.3);
+
+--Query 21:
+INSERT INTO Type
+VALUES(8,1),
+(8,2);
+
+--Query 22:
+UPDATE Metrics
+SET m_windspdmph = 56
+WHERE m_cycID = 8
+AND m_classID = 2
+AND m_date = '8/29/2022';
+
+--Query 23:
+UPDATE Damage
+SET d_death = 7
+WHERE d_cycID = 8;
+
+--Query 24:
+DELETE FROM Affected_Areas
+WHERE A_cycID = 8;
+
+--Query 25:
+DELETE FROM Damage
+WHERE d_cycID = 8;
+
+--Query 26:
+DELETE FROM Metrics
+WHERE m_cycID = 8;
+
+--Query 27:
+DELETE FROM Type
+WHERE type_cycID = 8;
+
+-- Query 28: Since tc_cycID is a FOREIGN ID it must be deleted last 
+DELETE FROM Tropical_Cyclones
+WHERE tc_cycID = 8;
+
+---------------------------------------------------------------
+
+

@@ -1,0 +1,2 @@
+Using alternative constructor
+This is test 2
